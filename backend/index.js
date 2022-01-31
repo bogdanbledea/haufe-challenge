@@ -3,11 +3,13 @@ import pg from 'pg';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
 const app = express();
 const port = 3000;
 const { Pool } = pg;
+const salt_rounds = 10;
 
 app.use(bodyParser.json());
 
@@ -18,6 +20,17 @@ const pool = new Pool({
   password: process.env.POSTGRES_PASSWORD,
   port: 5432
 });
+
+const generateToken = (user) => {
+  const token = jwt.sign(
+    { user_id: user.user_id, username: user.username, role: user.user_role },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "2h",
+    }
+  );
+  return token;
+}
 
 const checkIfUserExists = async (username) => {
   return new Promise(resolve => {
@@ -35,9 +48,39 @@ app.get('/health', (req, res) => {
   res.sendStatus(200);
 });
 
+// Login endpoint
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  // All fields are mandatory
+  if(!username || !password){
+    return res.status(400).json({status: 'failed', message: 'All fields are mandatory'});
+  }
+
+  checkIfUserExists(username).then(exists => {
+    if(exists){
+      pool.query(`SELECT * FROM users WHERE username = '${username}'`, (error, results) => {
+        if(results.rowCount === 1){
+          const hash_password = results.rows[0].user_password;
+          bcrypt.compare(password, hash_password, function(err, result) {
+            if(result){
+              const token = generateToken(results.rows[0]);
+              return res.status(200).json({status: 'success', message: 'Login successful.', token: token});
+            } else {
+              return res.status(400).json({status: 'failed', message: 'Password incorrect.'});
+            }
+        });
+        }
+      })
+    } else {
+      return res.status(400).json({status: 'failed', message: 'User does not exist.'});
+    }
+  });
+})
+
 // Register endpoint
 app.post('/register', (req, res) => {
-  const salt_rounds = 10;
+  
   const username_pattern = /^([a-zA-Z0-9_]+)$/
   const default_role = 'internal';
   const { username, password } = req.body;
