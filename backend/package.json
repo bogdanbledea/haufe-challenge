@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/bogdanbledea/haufe-challenge#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.19.1",
     "express": "^4.17.2",
     "nodemon": "^2.0.15",
     "pg": "^8.7.1"
