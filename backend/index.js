@@ -15,6 +15,10 @@ const pool = new Pool({
   port: 5432
 });
 
+app.get('/health', (req, res) => {
+  res.sendStatus(200);
+})
+
 app.get('/', (req, res) => {
   res.send('Hello World!')
 });
