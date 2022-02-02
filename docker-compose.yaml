@@ -1,7 +1,25 @@
 version: '3'
 services:
+  # Frontend service
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - 80:8080
+    links:
+      - backend
+  # Backend service
+  backend:
+    build: ./backend
+    container_name: backend
+    ports:
+      - 3000:3000
+    links:
+     - database
+  # Database service
   database:
     image: 'postgres'
+    container_name: database
     env_file:
       - ./db/database.env
     volumes:
