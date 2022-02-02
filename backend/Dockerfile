@@ -1,10 +1,12 @@
-FROM node:16-alpine3.14
+FROM node:16.13-alpine
 
 # Create app directory
 WORKDIR /usr/src/app
 
 # Install app dependencies
 COPY package*.json ./
+
+RUN rm -rf node_modules
 
 RUN npm install
 
