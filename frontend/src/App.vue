@@ -1,15 +1,33 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div v-if="healthyBackend">
+    <Home />
+  </div>
+  <div v-if="!healthyBackend">
+    <div>backend not healthy, not rendering UI</div>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Home from './components/Home.vue'
+import axios from 'axios'
 
 export default {
   name: 'App',
+  data() {
+    return {
+      healthyBackend: false
+    }
+  },
   components: {
-    HelloWorld
+    Home
+  },
+  created() {
+    // check if backend is healthy
+    axios.get('http://localhost:3000/health').then((res) => {
+      if(res.status === 200){
+        this.healthyBackend = true;
+      }
+    });
   }
 }
 </script>

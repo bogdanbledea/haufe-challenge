@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import cors from 'cors';
 
 dotenv.config();
 const app = express();
@@ -12,6 +13,7 @@ const { Pool } = pg;
 const salt_rounds = 10;
 
 app.use(bodyParser.json());
+app.use(cors());
 
 const pool = new Pool({
   user: process.env.POSTGRES_USER,
