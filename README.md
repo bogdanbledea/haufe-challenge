@@ -14,6 +14,7 @@ To be able to run the backend service, you must create a `.env` file in the root
 POSTGRES_USER=postgres-user
 POSTGRES_PASSWORD=postgres-pass
 POSTGRES_DB=postgres-db
+POSTGRES_HOST=postgres-host
 JWT_SECRET=jwt-secret
 ```
 
